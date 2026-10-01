@@ -1,0 +1,165 @@
+1. Herança - Pessoa, Aluno e Professor
+class Pessoa {
+  constructor(public nome: string) {}
+}
+
+class Aluno extends Pessoa {
+  constructor(nome: string, public matricula: string) {
+    super(nome);
+  }
+}
+
+class Professor extends Pessoa {
+  constructor(nome: string, public disciplina: string) {
+    super(nome);
+  }
+}
+
+const aluno1 = new Aluno("Guilherme", "2026001");
+const prof1 = new Professor("João", "Programação");
+console.log(aluno1, prof1);
+
+_________________________________________________________________________________________________________________________
+
+2. Encapsulamento - ContaBancaria
+class ContaBancaria {
+  private saldo: number; 
+
+  constructor(saldoInicial: number = 0) {
+    this.saldo = saldoInicial;
+  }
+
+  depositar(valor: number): void {
+    if (valor <= 0) throw new Error("Valor deve ser maior que zero");
+    this.saldo += valor;
+    console.log(`Depositado R$${valor}`);
+  }
+
+  sacar(valor: number): void {
+    if (valor > this.saldo) throw new Error("Saldo insuficiente");
+    this.saldo -= valor;
+    console.log(`Sacado R$${valor}`);
+  }
+
+_________________________________________________________________________________________________________________________
+
+3. Polimorfismo - Animal
+class Animal {
+  emitirSom(): void {
+    console.log("Som genérico de animal");
+  }
+}
+
+class Cachorro extends Animal {
+  emitirSom(): void {
+    console.log("Au au!");
+  }
+}
+
+class Gato extends Animal {
+  emitirSom(): void {
+    console.log("Miau!");
+  }
+}
+
+const animais: Animal[] = [new Cachorro(), new Gato()];
+animais.forEach(animal => animal.emitirSom()); 
+
+_________________________________________________________________________________________________________________________
+
+4. Abstração - Forma
+abstract class Forma {
+  abstract calcularArea(): number; 
+}
+
+class Retangulo extends Forma {
+  constructor(private largura: number, private altura: number) {
+    super();
+  }
+  calcularArea(): number {
+    return this.largura * this.altura;
+  }
+}
+
+class Circulo extends Forma {
+  constructor(private raio: number) {
+    super();
+  }
+  calcularArea(): number {
+    return Math.PI * this.raio * this.raio;
+  }
+}
+
+const ret = new Retangulo(10, 5);
+const circ = new Circulo(3);
+console.log("Área Retângulo:", ret.calcularArea());
+console.log("Área Círculo:", circ.calcularArea().toFixed(2));
+
+  consultarSaldo(): number {
+    return this.saldo;
+  }
+}
+
+const conta = new ContaBancaria(1000);
+conta.depositar(500);
+conta.sacar(200);
+console.log("Saldo:", conta.consultarSaldo());
+
+_________________________________________________________________________________________________________________________
+
+5. Projeto integrando os 4 pilares
+
+abstract class Pessoa {
+  constructor(public nome: string) {}
+
+  abstract exibirInformacoes(): void; 
+}
+
+class Aluno extends Pessoa {
+  private notas: number[] = [];
+
+  constructor(nome: string, public curso: string) {
+    super(nome);
+  }
+
+  adicionarNota(nota: number) {
+    if (nota < 0 || nota > 10) throw new Error("Nota inválida");
+    this.notas.push(nota);
+  }
+
+  getMedia(): number {
+    if (this.notas.length === 0) return 0;
+    return this.notas.reduce((a, b) => a + b, 0) / this.notas.length;
+  }
+
+  exibirInformacoes(): void {
+    console.log(`[ALUNO] ${this.nome} - Curso: ${this.curso} - Média: ${this.getMedia().toFixed(1)}`);
+  }
+}
+
+class Professor extends Pessoa {
+  private salario: number;
+
+  constructor(nome: string, public disciplina: string, salario: number) {
+    super(nome);
+    this.salario = salario;
+  }
+
+  getSalario(): number {
+    return this.salario;
+  }
+
+  exibirInformacoes(): void {
+    console.log(`[PROFESSOR] ${this.nome} - Disciplina: ${this.disciplina}`);
+  }
+}
+
+
+const aluno = new Aluno("izabella", "ADS");
+aluno.adicionarNota(8);
+aluno.adicionarNota(9);
+
+const professor = new Professor("Maria", "POO", 5000);
+
+const pessoas: Pessoa[] = [aluno, professor];
+pessoas.forEach(p => p.exibirInformacoes()); 
