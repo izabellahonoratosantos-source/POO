@@ -1,0 +1,144 @@
+function dividir(a: number, b: number): number {
+  if (b === 0) {
+    throw new Error("Não é possível dividir por zero");
+  }
+  return a / b;
+}
+
+try {
+  console.log(dividir(10, 0));
+} catch (erro) {
+  console.error("Ocorreu um erro:", (erro as Error).message);
+}
+
+
+function converterParaNumero(valor: string): number {
+  const numero = Number(valor);
+  if (isNaN(numero)) {
+    throw new Error(`Valor "${valor}" não é um número válido`);
+  }
+  return numero;
+}
+
+try {
+  // Tenta executar um código que pode falhar
+  const resultado = converterParaNumero("abc");
+  console.log("Resultado:", resultado);
+} catch (error) {
+  // Se falhar, cai aqui
+  console.error("Erro capturado:", (error as Error).message);
+}
+
+
+Funcionamento:
+O try tenta executar. Se tudo der certo, o catch é ignorado.
+Se um throw for lançado dentro do try, a execução para imediatamente e vai para o catch.
+
+_____________________________________________________________________________________________________________________________
+
+3. try, catch e finally
+try: Bloco onde colocamos o código que PODE gerar uma exceção.
+catch: Bloco que captura e trata a exceção lançada pelo try. Recebe o objeto do erro.
+finally: Bloco que SEMPRE será executado, independentemente de ter ocorrido erro ou não. Ideal para liberar recursos, fechar conexões, etc.
+
+       EXEMPLO:
+
+function lerArquivo(nome: string) {
+  try {
+    console.log(`Tentando abrir ${nome}...`);
+    if (!nome.endsWith(".txt")) {
+      throw new Error("Formato de arquivo inválido");
+    }
+    console.log("Arquivo lido com sucesso!");
+    return "conteúdo do arquivo";
+  } catch (erro) {
+    console.error("Falha na leitura:", (erro as Error).message);
+    return null;
+  } finally {
+    console.log("Finalizando operação - fechando arquivo.");
+  }
+}
+
+lerArquivo("foto.png");
+lerArquivo("dados.txt");
+
+_____________________________________________________________________________________________________________________________
+
+4. Para que serve o throw?
+Serve para lançar manualmente uma exceção quando identificamosuma situação inválida que viola as regras de negócio.
+Interrompemos o fluxo atual e obrigamos quem chamou a tratar.
+
+      Exemplo:
+
+function cadastrarIdade(idade: number) {
+  try {
+    if (idade < 0) {
+      throw new Error("Idade não pode ser negativa");
+    }
+    if (idade < 18) {
+      throw new Error("Cadastro permitido apenas para maiores de 18 anos");
+    }
+    console.log(`Idade ${idade} cadastrada com sucesso!`);
+  } catch (erro) {
+    console.error("Erro no cadastro:", (erro as Error).message);
+  }
+
+_____________________________________________________________________________________________________________________________
+
+5. Aplicação prática - Transferência Bancária
+
+
+
+class ValorInvalidoError extends Error {
+  constructor() {
+    super("O valor da transferência deve ser maior que zero.");
+    this.name = "ValorInvalidoError";
+  }
+}
+
+class SaldoInsuficienteError extends Error {
+  constructor(saldo: number, valor: number) {
+    super(`Saldo insuficiente! Saldo: R$${saldo} | Tentativa: R$${valor}`);
+    this.name = "SaldoInsuficienteError";
+  }
+}
+
+
+function transferir(saldo: number, valor: number): number {
+  if (valor <= 0) {
+    throw new ValorInvalidoError(); // Lança exceção se valor <= 0
+  }
+
+  if (valor > saldo) {
+    throw new SaldoInsuficienteError(saldo, valor); // Lança exceção se valor > saldo
+  }
+
+  
+  return saldo - valor;
+}
+
+
+
+let saldoAtual = 1000;
+
+console.log("TESTE 1 - Valor inválido (menor ou igual a zero)");
+try {
+  saldoAtual = transferir(saldoAtual, 0);
+} catch (error) {
+  console.log(`Erro tratado: ${(error as Error).message}`);
+}
+
+console.log("\nTESTE 2 - Saldo insuficiente");
+try {
+  saldoAtual = transferir(saldoAtual, 1500);
+} catch (error) {
+  console.log(`Erro tratado: ${(error as Error).message}`);
+}
+
+console.log("\nTESTE 3 - Transferência válida");
+try {
+  saldoAtual = transferir(saldoAtual, 300);
+  console.log(`Sucesso! Novo saldo: R$${saldoAtual}`);
+} catch (error) {
+  console.log(`Erro tratado: ${(error as Error).message}`);
+}
